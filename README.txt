@@ -5,12 +5,12 @@ This tool was created to streamline the process of breaking out the IP space of 
 Here is an example of what this script will do with the following input:
 
 	cidr = "192.168.1.0/22"
-	exclude_ips = ["192.168.2.99", "192.168.1.5"]
+	exclude_ips = ["192.168.2.99", "192.168.1.5/31"]
 
 Here is the result it provides given the above input:
 
-	192.168.0.0-192.168.1.4
+	192.168.0.1-192.168.1.3
 	192.168.1.6-192.168.2.98
-	192.168.2.100-192.168.3.255
+	192.168.2.100-192.168.3.254
 
 Once you return the above list, you can copy and paste it directly into the targets list in your Nessus scans. 
