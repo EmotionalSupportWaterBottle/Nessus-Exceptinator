@@ -2,7 +2,7 @@ FOR ETHICAL PURPOSES ONLY
 
 This tool was created to streamline the process of breaking out the IP space of an organization's network for use by security professionals who use Nessus as a scanning tool. It takes the IP space you provide it, and curates a hyphenated block of IP ranges, excluding all of the exceptions you input. Please make sure to double check the result provided by the script before firing your scans off against those IP ranges.
 
-Here is an example of what this script will do:
+Here is an example of what this script will do with the following input:
 
 	cidr = "192.168.1.0/22"
 	exclude_ips = ["192.168.2.99", "192.168.1.5"]
