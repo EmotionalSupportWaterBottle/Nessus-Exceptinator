@@ -1,97 +1,90 @@
 #!/bin/python3
 ### FOR ETHICAL PURPOSES ONLY ###
 ### https://github.com/EmotionalSupportWaterBottle ###
+
 import ipaddress
+import re
 
-def generate_ip_list(cidr, exclude_ips):
-    """
-    Generate a list of IP ranges from a CIDR block, excluding specific IPs or subnets.
-
-    Args:
-        cidr (str): CIDR notation representing the IP range (e.g., "192.168.1.0/22").
-        exclude_ips (list): List of IPs or subnets to exclude (e.g., ["192.168.1.5", "192.168.2.0/24"]).
-
-    Returns:
-        list: A list of IP ranges or individual IPs as strings.
-    """
-    try:
-        # Convert the CIDR range to an iterable list of IP addresses
-        network = ipaddress.ip_network(cidr, strict=False)
-    except ValueError as e:
-        raise ValueError(f"Invalid CIDR notation: {cidr}") from e
-
-    # Expand exclude_ips to handle individual IPs and subnets
-    excluded = set()
-    for ip in exclude_ips:
+def parse_ip_or_range(ip_input):
+    """Parse an IP, CIDR, or IP range and return a set of IP addresses."""
+    ip_set = set()
+    
+    # Handle CIDR notation
+    if '/' in ip_input:
         try:
-            if '/' in ip:
-                # It's a subnet
-                ip_obj = ipaddress.ip_network(ip, strict=False)
-                excluded.update(ip_obj.hosts())
-            else:
-                # It's a single IP
-                excluded.add(ipaddress.ip_address(ip))
+            network = ipaddress.ip_network(ip_input, strict=False)
+            ip_set.update(network.hosts())
         except ValueError:
-            raise ValueError(f"Invalid IP or subnet in exclude_ips: {ip}")
+            raise ValueError(f"Invalid CIDR notation: {ip_input}")
+    
+    # Handle IP range (e.g., 192.168.1.10-192.168.1.20)
+    elif '-' in ip_input:
+        try:
+            start_ip, end_ip = ip_input.split('-')
+            start_ip, end_ip = ipaddress.ip_address(start_ip), ipaddress.ip_address(end_ip)
+            
+            if start_ip > end_ip:
+                raise ValueError(f"Invalid range: {ip_input}. Start IP must be lower than End IP.")
+            
+            for ip_int in range(int(start_ip), int(end_ip) + 1):
+                ip_set.add(ipaddress.ip_address(ip_int))
+        except ValueError:
+            raise ValueError(f"Invalid IP range: {ip_input}")
+    
+    # Handle single IP
+    else:
+        try:
+            ip_set.add(ipaddress.ip_address(ip_input))
+        except ValueError:
+            raise ValueError(f"Invalid IP address: {ip_input}")
+    
+    return ip_set
 
-    # Filter out the excluded IPs
-    filtered_ips = [ip for ip in network.hosts() if ip not in excluded]
-
-    # Format consecutive IPs into ranges
-    ip_ranges = format_ip_ranges(filtered_ips)
-
-    return ip_ranges
+def generate_ip_list(ip_range, exclude_list):
+    """
+    Generate a list of IP ranges from an IP range, CIDR, or individual IPs, excluding specific IPs or subnets.
+    """
+    included_ips = parse_ip_or_range(ip_range)
+    excluded_ips = set()
+    
+    for exclude in exclude_list:
+        excluded_ips.update(parse_ip_or_range(exclude))
+    
+    # Compute remaining IPs after exclusion
+    remaining_ips = sorted(included_ips - excluded_ips)
+    
+    return format_ip_ranges(remaining_ips)
 
 def format_ip_ranges(ip_list):
-    """
-    Format a list of IPs into ranges.
-
-    Args:
-        ip_list (list): List of IP address objects.
-
-    Returns:
-        list: A list of IP ranges or individual IPs as strings.
-    """
+    """Format a sorted list of IPs into hyphenated ranges."""
     if not ip_list:
         return []
-
+    
     result = []
     start_ip = prev_ip = ip_list[0]
-
+    
     for ip in ip_list[1:]:
         if int(ip) != int(prev_ip) + 1:
             result.append(format_range(start_ip, prev_ip))
             start_ip = ip
         prev_ip = ip
-
-    # Add the last range or IP
+    
+    # Append last range
     result.append(format_range(start_ip, prev_ip))
-
+    
     return result
 
 def format_range(start_ip, end_ip):
-    """
-    Format a range of IPs as a string.
+    """Format a range of IPs as a string."""
+    return str(start_ip) if start_ip == end_ip else f"{start_ip}-{end_ip}"
 
-    Args:
-        start_ip (IPv4Address or IPv6Address): Start IP of the range.
-        end_ip (IPv4Address or IPv6Address): End IP of the range.
-
-    Returns:
-        str: Formatted range (e.g., "192.168.1.1-192.168.1.10" or "192.168.1.1").
-    """
-    if start_ip == end_ip:
-        return str(start_ip)
-    else:
-        return f"{start_ip}-{end_ip}"
-
-# Example usage
+# Example Usage
 if __name__ == "__main__":
-    cidr = "x.x.x.x/x"
-    exclude_ips = ["x.x.x.x", "x.x.x.x/x", "x.x.x.x"]
-
+    ip_range = "x.x.x.x/x"  # Can be CIDR, range, or single IP
+    exclude_ips = ["x.x.x.x", "x.x.x.x-x.x.x.x", "x.x.x.x/x"]  # Can be CIDRs, ranges, or single IPs
+    
     try:
-        ip_list = generate_ip_list(cidr, exclude_ips)
+        ip_list = generate_ip_list(ip_range, exclude_ips)
         print("\n".join(ip_list))
     except ValueError as e:
         print(f"Error: {e}")
