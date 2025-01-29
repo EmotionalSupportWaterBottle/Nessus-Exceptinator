@@ -4,13 +4,16 @@ This tool was created to streamline the process of breaking out the IP space of 
 
 Here is an example of what this script will do with the following input:
 
-	cidr = "192.168.1.0/22"
-	exclude_ips = ["192.168.2.99", "192.168.1.5/31"]
+	if __name__ == "__main__":
+		ip_range = "10.10.10.0/10"  # Can be CIDR, range, or single IP
+		exclude_ips = ["10.10.10.90", "10.10.10.252-10.10.11.60", "10.10.15.0/24"]  # Can be CIDRs, ranges, or single IPs
+
 
 Here is the result it provides given the above input:
 
-	192.168.0.1-192.168.1.3
-	192.168.1.6-192.168.2.98
-	192.168.2.100-192.168.3.254
+	10.0.0.1-10.10.10.89
+	10.10.10.91-10.10.10.251
+	10.10.11.61-10.10.15.0
+	10.10.15.255-10.63.255.254
 
 Once you return the above list, you can copy and paste it directly into the targets list in your Nessus scans. 
