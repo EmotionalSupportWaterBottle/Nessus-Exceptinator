@@ -80,7 +80,7 @@ def format_range(start_ip, end_ip):
 
 # Example Usage
 if __name__ == "__main__":
-    ip_range = "x.x.x.x/x"  # Can be CIDR, range, or single IP
+    ip_range = "x.x.x.x/x"
     exclude_ips = ["x.x.x.x", "x.x.x.x-x.x.x.x", "x.x.x.x/x"]  # Can be CIDRs, ranges, or single IPs
     
     try:
