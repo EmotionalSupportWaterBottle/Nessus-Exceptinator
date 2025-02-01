@@ -5,8 +5,8 @@ This tool was created to streamline the process of breaking out the IP space of 
 Here is an example of what this script will do with the following input:
 
 	if __name__ == "__main__":
-		ip_range = "10.10.10.0/10"
-		exclude_ips = ["10.10.10.90", "10.10.10.252-10.10.11.60", "10.10.15.0/24"]  # Can be CIDRs, ranges, or single IPs
+		ip_range = "10.10.10.0/10" ### Can be CIDR notation or a hyphenated range ###
+		exclude_ips = ["10.10.10.90", "10.10.10.252-10.10.11.60", "10.10.15.0/24"]  ### Can be CIDRs, ranges, or single IPs ###
 
 
 Here is the result it provides given the above input:
