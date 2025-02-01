@@ -80,8 +80,8 @@ def format_range(start_ip, end_ip):
 
 # Example Usage
 if __name__ == "__main__":
-    ip_range = "x.x.x.x/x"
-    exclude_ips = ["x.x.x.x", "x.x.x.x-x.x.x.x", "x.x.x.x/x"]  # Can be CIDRs, ranges, or single IPs
+    ip_range = "x.x.x.x/x" ### Can be CIDR notation or a hyphenated IP range ###
+    exclude_ips = ["x.x.x.x", "x.x.x.x-x.x.x.x", "x.x.x.x/x"]  ### Can be CIDR notation, hyphanted IP ranges, or single IPs ###
     
     try:
         ip_list = generate_ip_list(ip_range, exclude_ips)
