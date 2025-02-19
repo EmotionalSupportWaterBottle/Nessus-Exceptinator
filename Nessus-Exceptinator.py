@@ -3,7 +3,6 @@
 ### https://github.com/EmotionalSupportWaterBottle ###
 
 import ipaddress
-import re
 
 def parse_ip_or_range(ip_input):
     """Parse an IP, CIDR, or IP range and return a set of IP addresses."""
@@ -40,13 +39,18 @@ def parse_ip_or_range(ip_input):
     
     return ip_set
 
-def generate_ip_list(ip_range, exclude_list):
+def generate_ip_list(ip_ranges, exclude_list):
     """
-    Generate a list of IP ranges from an IP range, CIDR, or individual IPs, excluding specific IPs or subnets.
+    Generate a list of IPs from multiple IP ranges (CIDRs, ranges, or individual IPs), excluding specific IPs or subnets.
     """
-    included_ips = parse_ip_or_range(ip_range)
-    excluded_ips = set()
+    included_ips = set()
     
+    # Process each IP range in the list
+    for ip_range in ip_ranges:
+        included_ips.update(parse_ip_or_range(ip_range))
+    
+    # Process exclusion list
+    excluded_ips = set()
     for exclude in exclude_list:
         excluded_ips.update(parse_ip_or_range(exclude))
     
@@ -80,11 +84,11 @@ def format_range(start_ip, end_ip):
 
 # Example Usage
 if __name__ == "__main__":
-    ip_range = "x.x.x.x/x" ### Can be CIDR notation or a hyphenated IP range ###
-    exclude_ips = ["x.x.x.x", "x.x.x.x-x.x.x.x", "x.x.x.x/x"]  ### Can be CIDR notation, hyphanted IP ranges, or single IPs ###
+    ip_ranges = input("Enter IP ranges (comma-separated): ").split(',')
+    exclude_ips = input("Enter IPs to exclude (comma-separated): ").split(',')
     
     try:
-        ip_list = generate_ip_list(ip_range, exclude_ips)
+        ip_list = generate_ip_list([ip.strip() for ip in ip_ranges], [ip.strip() for ip in exclude_ips])
         print("\n".join(ip_list))
     except ValueError as e:
         print(f"Error: {e}")
